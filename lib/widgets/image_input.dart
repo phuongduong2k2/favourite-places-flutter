@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:favourite_places/widgets/icon_text.dart';
+import 'package:favourite_places/widgets/loading_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -19,7 +20,11 @@ class _ImageInputState extends State<ImageInput> {
   void _pickImage() async {
     final picker = ImagePicker();
     try {
+      LoadingDialog.show(context, message: "Loading...");
       final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+      if (context.mounted) {
+        LoadingDialog.hide(context);
+      }
       if (image != null) {
         setState(() {
           imageFile = File(image.path);

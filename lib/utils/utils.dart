@@ -7,12 +7,14 @@ import "package:http/http.dart" as http;
 String getLocationImage({
   num? longitude = 0,
   num? latitude = 0,
-  num? zoom = 20,
+  num? zoom = 17,
   num? bearing = 0,
   num? pitch = 0,
+  num? width = 600,
+  num? height = 600,
 }) {
   final String accessToken = dotenv.get("ACCESS_TOKEN");
-  return "https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/$longitude,$latitude,$zoom,$bearing,$pitch/600x600?access_token=$accessToken";
+  return "https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/$longitude,$latitude,$zoom,$bearing,$pitch/${height}x$width?access_token=$accessToken";
 }
 
 Future<String> getLocationAddress({

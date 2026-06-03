@@ -1,31 +1,42 @@
-import 'package:favourite_places/widgets/map_view.dart';
 import 'package:flutter/material.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
 class MapScreen extends StatefulWidget {
-  const MapScreen({super.key, this.currentPosition});
+  const MapScreen({super.key, this.position});
 
-  final Position? currentPosition;
+  final Position? position;
 
   @override
   State<MapScreen> createState() => _MapScreenState();
 }
 
 class _MapScreenState extends State<MapScreen> {
-  MapboxMap? mapboxMap;
+  bool _isDone = false;
 
-  void _onMapCreated(MapboxMap mapboxMap) {
-    this.mapboxMap = mapboxMap;
-
-    mapboxMap.location.updateSettings(
-      LocationComponentSettings(enabled: true),
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(milliseconds: 500)).then(
+      (_) => setState(() {
+        _isDone = true;
+      }),
     );
   }
 
-  void _getCurrentLocation() async {
-    CameraState? cameraState = await mapboxMap?.getCameraState();
-    if (cameraState != null && context.mounted) {
-      Navigator.of(context).pop(cameraState.center.coordinates);
+  void _onMapCreated(MapboxMap mapboxMap) async {
+    if (widget.position != null) {
+      CircleAnnotationManager circleAnnotationManager = await mapboxMap
+          .annotations
+          .createCircleAnnotationManager();
+      CircleAnnotationOptions circleAnnotationOptions = CircleAnnotationOptions(
+        geometry: Point(coordinates: widget.position!),
+        circleColor: Colors.red.toARGB32(),
+        circleStrokeWidth: 1,
+        circleStrokeColor: Colors.black.toARGB32(),
+        circleRadius: 8,
+      );
+
+      circleAnnotationManager.create(circleAnnotationOptions);
     }
   }
 
@@ -36,20 +47,22 @@ class _MapScreenState extends State<MapScreen> {
         title: const Text("Map"),
         centerTitle: false,
       ),
-      body: Column(
-        children: [
-          MapView(
-            onMapCreated: _onMapCreated,
-            lat: widget.currentPosition?.lat,
-            lng: widget.currentPosition?.lng,
-            height: MediaQuery.of(context).size.height - 400,
-          ),
-          ElevatedButton(
-            onPressed: _getCurrentLocation,
-            child: Text("Select Position"),
-          ),
-        ],
-      ),
+      body: _isDone
+          ? MapWidget(
+              onMapCreated: _onMapCreated,
+              viewport: CameraViewportState(
+                center: Point(
+                  coordinates: Position(
+                    widget.position?.lng ?? 0,
+                    widget.position?.lat ?? 0,
+                  ),
+                ),
+                zoom: 17,
+              ),
+            )
+          : Center(
+              child: CircularProgressIndicator(),
+            ),
     );
   }
 }

@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:favourite_places/models/place.dart';
 import 'package:favourite_places/providers/places.dart';
-import 'package:favourite_places/utils/utils.dart';
 import 'package:favourite_places/widgets/image_input.dart';
 import 'package:favourite_places/widgets/location_input.dart';
 import 'package:flutter/material.dart';
@@ -22,19 +21,17 @@ class _NewPlaceScreenState extends ConsumerState<NewPlaceScreen> {
   final TextEditingController _titleController = TextEditingController();
   File? _imageFile;
   Position? _position;
+  String _address = "";
 
   void _handleSubmit() async {
     if (_titleController.text.isNotEmpty &&
         _imageFile != null &&
-        _position != null) {
-      String address = await getLocationAddress(
-        latitude: _position!.lat,
-        longitude: _position!.lng,
-      );
+        _position != null &&
+        _address.isNotEmpty) {
       final place = Place(
         title: _titleController.text,
         image: _imageFile!,
-        location: PlaceLocation(position: _position!, address: address),
+        location: PlaceLocation(position: _position!, address: _address),
       );
       ref.read(placesProvider.notifier).add(place);
 
@@ -67,7 +64,10 @@ class _NewPlaceScreenState extends ConsumerState<NewPlaceScreen> {
               onPickedImage: (file) => _imageFile = file,
             ),
             LocationInput(
-              onSelectedLocation: (position) => _position = position,
+              onSelectedLocation: ({required address, required position}) {
+                _position = position;
+                _address = address;
+              },
             ),
             ElevatedButton.icon(
               onPressed: _handleSubmit,

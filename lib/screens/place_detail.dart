@@ -1,10 +1,19 @@
 import 'package:favourite_places/models/place.dart';
+import 'package:favourite_places/screens/map.dart';
 import 'package:flutter/material.dart';
 
 class PlaceDetail extends StatelessWidget {
   const PlaceDetail({super.key, required this.place});
 
   final Place place;
+
+  void _openMap(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => MapScreen(position: place.location.position),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,6 +24,7 @@ class PlaceDetail extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         child: Column(
+          spacing: 16,
           children: [
             Image.file(
               place.image,
@@ -22,6 +32,14 @@ class PlaceDetail extends StatelessWidget {
               width: double.infinity,
               alignment: Alignment.center,
               fit: BoxFit.cover,
+            ),
+            Text(
+              "Location: ${place.location.address}",
+              textAlign: TextAlign.center,
+            ),
+            ElevatedButton.icon(
+              onPressed: () => _openMap(context),
+              label: const Text("Open Map"),
             ),
           ],
         ),

@@ -1,4 +1,4 @@
-import 'package:favourite_places/screens/map.dart';
+import 'package:favourite_places/screens/map_picker.dart';
 import 'package:favourite_places/utils/utils.dart';
 import 'package:favourite_places/widgets/icon_text.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +9,8 @@ import 'package:transparent_image/transparent_image.dart';
 class LocationInput extends StatefulWidget {
   const LocationInput({super.key, required this.onSelectedLocation});
 
-  final Function(Position position) onSelectedLocation;
+  final Function({required Position position, required String address})
+  onSelectedLocation;
 
   @override
   State<LocationInput> createState() => _LocationInputState();
@@ -18,21 +19,8 @@ class LocationInput extends StatefulWidget {
 class _LocationInputState extends State<LocationInput> {
   Position? _position;
   MapboxMap? mapboxMap;
-
-  void _onMapCreated(MapboxMap mapboxMap) {
-    this.mapboxMap = mapboxMap;
-
-    mapboxMap.gestures.updateSettings(
-      GesturesSettings(
-        doubleTapToZoomInEnabled: false,
-        pinchPanEnabled: false,
-        pinchToZoomEnabled: false,
-        pitchEnabled: false,
-        rotateEnabled: false,
-        scrollEnabled: false,
-      ),
-    );
-  }
+  String _address = "";
+  bool _isLoading = false;
 
   Future<geol.Position> _determinePosition() async {
     bool serviceEnabled;
@@ -73,32 +61,61 @@ class _LocationInputState extends State<LocationInput> {
   }
 
   void _getCurrentPosition() async {
+    setState(() {
+      _isLoading = true;
+    });
     geol.Position geolPosition = await _determinePosition();
     final Position position = Position(
       geolPosition.longitude,
       geolPosition.latitude,
     );
-    widget.onSelectedLocation(position);
+    String address = await getLocationAddress(
+      longitude: geolPosition.longitude,
+      latitude: geolPosition.latitude,
+    );
+    setState(() {
+      _isLoading = false;
+    });
+    if (address.isEmpty) {
+      return;
+    }
+    widget.onSelectedLocation(position: position, address: address);
     setState(() {
       _position = position;
+      _address = address;
     });
   }
 
   void _selectOnMap() async {
+    if (!context.mounted) {
+      return;
+    }
     Position? position = await Navigator.of(context).push<Position>(
       MaterialPageRoute(
-        builder: (_) => MapScreen(
+        builder: (_) => MapPickerScreen(
           currentPosition: _position,
         ),
       ),
     );
-
+    setState(() {
+      _isLoading = true;
+    });
     if (position != null) {
-      widget.onSelectedLocation(position);
-      setState(() {
-        _position = position;
-      });
+      String address = await getLocationAddress(
+        latitude: position.lat,
+        longitude: position.lng,
+      );
+      if (address.isNotEmpty) {
+        widget.onSelectedLocation(position: position, address: address);
+        setState(() {
+          _position = position;
+          _address = address;
+        });
+      }
     }
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -114,16 +131,27 @@ class _LocationInputState extends State<LocationInput> {
             ),
             borderRadius: BorderRadius.all(Radius.circular(8)),
           ),
-          child: _position != null
-              ? FadeInImage.memoryNetwork(
-                  placeholder: kTransparentImage,
-                  image: getLocationImage(
-                    latitude: _position!.lat,
-                    longitude: _position!.lng,
-                  ),
+          child: _position != null && _address.isNotEmpty
+              ? Column(
+                  children: [
+                    Expanded(
+                      child: FadeInImage.memoryNetwork(
+                        placeholder: kTransparentImage,
+                        image: getLocationImage(
+                          latitude: _position!.lat,
+                          longitude: _position!.lng,
+                          width: (MediaQuery.of(context).size.width - 24)
+                              .toInt(),
+                        ),
+                      ),
+                    ),
+                    Text(_address),
+                  ],
                 )
               : Center(
-                  child: const Text("No location chosen"),
+                  child: _isLoading
+                      ? CircularProgressIndicator()
+                      : const Text("No location chosen"),
                 ),
         ),
         Row(

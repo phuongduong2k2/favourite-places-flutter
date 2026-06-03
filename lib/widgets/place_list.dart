@@ -1,23 +1,18 @@
 import 'package:favourite_places/models/place.dart';
 import 'package:favourite_places/providers/places.dart';
-import 'package:favourite_places/screens/place_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class PlaceList extends ConsumerStatefulWidget {
-  const PlaceList({super.key});
+  const PlaceList({super.key, required this.onSelectedLocation});
+
+  final Function(Place place) onSelectedLocation;
 
   @override
   ConsumerState<PlaceList> createState() => _PlaceListState();
 }
 
 class _PlaceListState extends ConsumerState<PlaceList> {
-  void _selectPlace(Place place) {
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute(builder: (_) => PlaceDetail(place: place)));
-  }
-
   @override
   Widget build(BuildContext context) {
     final List<Place> places = ref.watch(placesProvider);
@@ -27,7 +22,7 @@ class _PlaceListState extends ConsumerState<PlaceList> {
         clipBehavior: Clip.hardEdge,
         child: InkWell(
           key: ValueKey(places[index].id),
-          onTap: () => _selectPlace(places[index]),
+          onTap: () => widget.onSelectedLocation(places[index]),
           child: SizedBox(
             height: 100,
             child: Padding(

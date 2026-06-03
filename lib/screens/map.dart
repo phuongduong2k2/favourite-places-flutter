@@ -46,7 +46,7 @@ class _MapScreenState extends State<MapScreen> {
           ),
           ElevatedButton(
             onPressed: _getCurrentLocation,
-            child: Text("Get current position"),
+            child: Text("Select Position"),
           ),
         ],
       ),

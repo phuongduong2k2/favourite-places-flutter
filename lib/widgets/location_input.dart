@@ -1,12 +1,15 @@
 import 'package:favourite_places/screens/map.dart';
+import 'package:favourite_places/utils/utils.dart';
 import 'package:favourite_places/widgets/icon_text.dart';
-import 'package:favourite_places/widgets/map_view.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart' as geol;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 class LocationInput extends StatefulWidget {
-  const LocationInput({super.key});
+  const LocationInput({super.key, required this.onSelectedLocation});
+
+  final Function(Position position) onSelectedLocation;
 
   @override
   State<LocationInput> createState() => _LocationInputState();
@@ -70,9 +73,14 @@ class _LocationInputState extends State<LocationInput> {
   }
 
   void _getCurrentPosition() async {
-    geol.Position position = await _determinePosition();
+    geol.Position geolPosition = await _determinePosition();
+    final Position position = Position(
+      geolPosition.longitude,
+      geolPosition.latitude,
+    );
+    widget.onSelectedLocation(position);
     setState(() {
-      _position = Position(position.longitude, position.latitude);
+      _position = position;
     });
   }
 
@@ -86,6 +94,7 @@ class _LocationInputState extends State<LocationInput> {
     );
 
     if (position != null) {
+      widget.onSelectedLocation(position);
       setState(() {
         _position = position;
       });
@@ -106,10 +115,12 @@ class _LocationInputState extends State<LocationInput> {
             borderRadius: BorderRadius.all(Radius.circular(8)),
           ),
           child: _position != null
-              ? MapView(
-                  onMapCreated: _onMapCreated,
-                  lat: _position!.lat,
-                  lng: _position!.lng,
+              ? FadeInImage.memoryNetwork(
+                  placeholder: kTransparentImage,
+                  image: getLocationImage(
+                    latitude: _position!.lat,
+                    longitude: _position!.lng,
+                  ),
                 )
               : Center(
                   child: const Text("No location chosen"),

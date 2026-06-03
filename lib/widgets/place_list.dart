@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:favourite_places/models/place.dart';
 import 'package:favourite_places/providers/places.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +49,7 @@ class _PlaceListState extends ConsumerState<PlaceList> {
                   ),
                   AspectRatio(
                     aspectRatio: 100 / (100 - 24),
-                    child: Image.file(places[index].image),
+                    child: Image.file(File(places[index].imagePath)),
                   ),
                 ],
               ),

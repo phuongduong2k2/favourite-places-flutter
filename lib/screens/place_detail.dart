@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:favourite_places/models/place.dart';
 import 'package:favourite_places/screens/map.dart';
 import 'package:flutter/material.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
 class PlaceDetail extends StatelessWidget {
   const PlaceDetail({super.key, required this.place});
@@ -10,7 +13,9 @@ class PlaceDetail extends StatelessWidget {
   void _openMap(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => MapScreen(position: place.location.position),
+        builder: (_) => MapScreen(
+          position: Position(place.location.longitude, place.location.latitude),
+        ),
       ),
     );
   }
@@ -27,7 +32,7 @@ class PlaceDetail extends StatelessWidget {
           spacing: 16,
           children: [
             Image.file(
-              place.image,
+              File(place.imagePath),
               height: 200,
               width: double.infinity,
               alignment: Alignment.center,

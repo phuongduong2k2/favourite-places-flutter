@@ -145,7 +145,10 @@ class _LocationInputState extends State<LocationInput> {
                         ),
                       ),
                     ),
-                    Text(_address),
+                    Text(
+                      _address,
+                      textAlign: TextAlign.center,
+                    ),
                   ],
                 )
               : Center(

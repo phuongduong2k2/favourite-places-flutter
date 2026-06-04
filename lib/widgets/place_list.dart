@@ -1,4 +1,5 @@
 import 'package:favourite_places/models/place.dart';
+import 'package:favourite_places/widgets/place_card.dart';
 import 'package:flutter/material.dart';
 
 class PlaceList extends StatefulWidget {
@@ -25,48 +26,24 @@ class _PlaceListState extends State<PlaceList> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: widget.places.length,
-      itemBuilder: (context, index) => Dismissible(
-        key: ValueKey(widget.places[index].id),
-        onDismissed: (_) => widget.onDelete(widget.places[index]),
-        child: Card(
-          clipBehavior: Clip.hardEdge,
-          child: InkWell(
-            key: ValueKey(widget.places[index].id),
-            onTap: () => widget.onTapPlace(widget.places[index]),
-            child: SizedBox(
-              height: 100,
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            widget.places[index].title,
-                            style: TextStyle(fontSize: 20),
-                          ),
-                          Text(
-                            widget.places[index].location.address,
-                            style: TextStyle(fontSize: 12),
-                          ),
-                        ],
-                      ),
-                    ),
-                    AspectRatio(
-                      aspectRatio: 100 / (100 - 24),
-                      child: Image.file(widget.places[index].image),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+    if (widget.places.isEmpty) {
+      return Center(
+        child: ElevatedButton.icon(
+          onPressed: () {},
+          icon: Icon(Icons.add),
+          label: const Text("Add Place"),
         ),
+      );
+    }
+
+    return ListView.separated(
+      itemCount: widget.places.length,
+      padding: EdgeInsets.all(16),
+      separatorBuilder: (_, _) => SizedBox(height: 16),
+      itemBuilder: (context, index) => PlaceCard(
+        place: widget.places[index],
+        onTap: widget.onTapPlace,
+        onDelete: widget.onDelete,
       ),
     );
   }

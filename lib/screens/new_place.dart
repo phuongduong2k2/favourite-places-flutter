@@ -54,7 +54,7 @@ class _NewPlaceScreenState extends ConsumerState<NewPlaceScreen> {
         centerTitle: false,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(16),
         child: Column(
           spacing: 8,
           children: [

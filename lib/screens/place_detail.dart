@@ -12,6 +12,7 @@ class PlaceDetail extends StatelessWidget {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => MapScreen(
+          name: place.title,
           position: Position(place.location.longitude, place.location.latitude),
         ),
       ),

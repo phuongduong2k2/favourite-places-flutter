@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
 class MapScreen extends StatefulWidget {
-  const MapScreen({super.key, this.position});
+  const MapScreen({super.key, this.position, required this.name});
 
   final Position? position;
+  final String name;
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -44,7 +45,7 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Map"),
+        title: Text("${widget.name} Location"),
         centerTitle: false,
       ),
       body: _isDone

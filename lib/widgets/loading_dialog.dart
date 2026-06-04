@@ -3,26 +3,31 @@ import 'package:flutter/material.dart';
 class LoadingDialog {
   // 1. Show the loading dialog
   static void show(BuildContext context, {String message = 'Loading...'}) {
-    showDialog(
+    showGeneralDialog(
       context: context,
-      barrierDismissible:
-          false, // Prevents closing the dialog by tapping outside
-      builder: (BuildContext context) {
-        return PopScope(
-          canPop:
-              false, // Prevents closing the dialog via the system back button
-          child: AlertDialog(
-            content: Row(
-              children: [
-                const CircularProgressIndicator(),
-                const SizedBox(width: 20),
-                Expanded(
-                  child: Text(
+      barrierDismissible: false,
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return Center(
+          child: Material(
+            type: MaterialType.transparency,
+            child: Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 8),
+                  Text(
                     message,
-                    style: const TextStyle(fontSize: 16),
+                    style: TextStyle(fontSize: 12, color: Colors.black),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );

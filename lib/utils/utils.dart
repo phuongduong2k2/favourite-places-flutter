@@ -1,8 +1,16 @@
 import "dart:convert";
+import "dart:io";
 
 import "package:favourite_places/models/location_address.dart";
 import "package:flutter_dotenv/flutter_dotenv.dart";
 import "package:http/http.dart" as http;
+import "package:logger/logger.dart";
+import "package:path/path.dart";
+import "package:path_provider/path_provider.dart";
+import "package:uuid/uuid.dart";
+
+var _logger = Logger();
+var _uuid = Uuid();
 
 String getLocationImage({
   num? longitude = 0,
@@ -38,7 +46,22 @@ Future<String> getLocationAddress({
       throw Exception(response.body);
     }
   } catch (error) {
-    print("getLocationAddress: $error");
+    _logger.e("getLocationAddress: $error");
     return "";
   }
+}
+
+String getRandomUuid() {
+  return _uuid.v4();
+}
+
+Future<File> copyFile({required File file, bool isRandomName = false}) async {
+  final appDir = await getApplicationDocumentsDirectory();
+  var fileName = basename(file.path);
+  if (isRandomName) {
+    final fileTail = fileName.split(".")[1];
+    fileName = "${getRandomUuid()}.$fileTail";
+  }
+  final copiedFile = await file.copy("${appDir.path}/$fileName");
+  return copiedFile;
 }

@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:favourite_places/models/place.dart';
 import 'package:favourite_places/screens/map.dart';
 import 'package:flutter/material.dart';
@@ -32,7 +30,7 @@ class PlaceDetail extends StatelessWidget {
           spacing: 16,
           children: [
             Image.file(
-              File(place.imagePath),
+              place.image,
               height: 200,
               width: double.infinity,
               alignment: Alignment.center,

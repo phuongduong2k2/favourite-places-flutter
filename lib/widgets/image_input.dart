@@ -4,6 +4,9 @@ import 'package:favourite_places/widgets/icon_text.dart';
 import 'package:favourite_places/widgets/loading_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:logger/logger.dart';
+
+var _logger = Logger();
 
 class ImageInput extends StatefulWidget {
   const ImageInput({super.key, required this.onPickedImage});
@@ -32,7 +35,7 @@ class _ImageInputState extends State<ImageInput> {
         widget.onPickedImage(File(image.path));
       }
     } catch (error) {
-      print(error);
+      _logger.e(error);
     }
   }
 

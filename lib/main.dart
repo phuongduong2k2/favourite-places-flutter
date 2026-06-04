@@ -33,8 +33,8 @@ final theme = ThemeData().copyWith(
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load();
 
+  await dotenv.load();
   final String accessToken = dotenv.get("ACCESS_TOKEN");
   MapboxOptions.setAccessToken(accessToken);
 

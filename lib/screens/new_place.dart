@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:favourite_places/models/place.dart';
 import 'package:favourite_places/providers/places.dart';
 import 'package:favourite_places/widgets/image_input.dart';
@@ -17,27 +19,28 @@ class NewPlaceScreen extends ConsumerStatefulWidget {
 
 class _NewPlaceScreenState extends ConsumerState<NewPlaceScreen> {
   final TextEditingController _titleController = TextEditingController();
-  String _imagePath = "";
+  File? _image;
   Position? _position;
   String _address = "";
 
   void _handleSubmit() async {
     if (_titleController.text.isNotEmpty &&
-        _imagePath.isNotEmpty &&
+        _image != null &&
         _position != null &&
         _address.isNotEmpty) {
-      final place = Place(
-        title: _titleController.text,
-        imagePath: _imagePath,
-        location: PlaceLocation(
-          latitude: _position!.lat,
-          longitude: _position!.lng,
-          address: _address,
-        ),
-      );
-      ref.read(placesProvider.notifier).add(place);
+      bool isSuccess = await ref
+          .read(placesProvider.notifier)
+          .add(
+            _titleController.text,
+            _image!,
+            PlaceLocation(
+              latitude: _position!.lat,
+              longitude: _position!.lng,
+              address: _address,
+            ),
+          );
 
-      if (context.mounted) {
+      if (context.mounted && isSuccess) {
         Navigator.of(context).pop();
       }
     }
@@ -63,7 +66,7 @@ class _NewPlaceScreenState extends ConsumerState<NewPlaceScreen> {
             ),
 
             ImageInput(
-              onPickedImage: (file) => _imagePath = file.path,
+              onPickedImage: (file) => _image = file,
             ),
             LocationInput(
               onSelectedLocation: ({required address, required position}) {
@@ -76,6 +79,10 @@ class _NewPlaceScreenState extends ConsumerState<NewPlaceScreen> {
               icon: const Icon(Icons.add),
               label: const Text("Add Place"),
             ),
+            // ElevatedButton(
+            //   onPressed: ref.read(placesProvider.notifier).dropTable,
+            //   child: const Text("Drop table"),
+            // ),
           ],
         ),
       ),
